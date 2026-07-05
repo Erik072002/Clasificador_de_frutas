@@ -144,8 +144,77 @@ def cargar_clases():
         return json.load(f)
 
 
-def formatear_nombre(nombre_clase: str) -> str:
-    return nombre_clase.replace("_", " ").strip().title()
+# ---------------------------------------------------------------------------
+# Traducción dinámica de nombres de clase (inglés -> español)
+#
+# Fruits-360 nombra sus clases en inglés (ej. "Apple Golden 1", "Cherry Wax
+# Black"). En vez de traducir a mano las ~260 clases, se traduce PALABRA POR
+# PALABRA usando este diccionario, así funciona automáticamente sin importar
+# cuántas ni cuáles clases traiga class_names.json.
+#
+# Las variedades/marcas (Braeburn, Granny Smith, Kaiser, etc.) se dejan tal
+# cual, ya que en español también se usan esos nombres comercialmente.
+# ---------------------------------------------------------------------------
+PALABRAS_ES = {
+    "apple": "Manzana", "apricot": "Albaricoque", "avocado": "Aguacate",
+    "banana": "Plátano", "beans": "Frijoles", "beetroot": "Remolacha",
+    "blackberry": "Mora", "blueberry": "Arándano", "cabbage": "Col",
+    "cactus": "Cactus", "fruit": "Fruta", "cantaloupe": "Melón",
+    "carambula": "Carambola", "carrot": "Zanahoria", "cauliflower": "Coliflor",
+    "celery": "Apio", "cherimoya": "Chirimoya", "cherry": "Cereza",
+    "chestnut": "Castaña", "clementine": "Clementina", "cocos": "Coco",
+    "corn": "Maíz", "husk": "Cáscara", "cucumber": "Pepino", "ripe": "Maduro",
+    "dates": "Dátiles", "eggplant": "Berenjena", "fig": "Higo",
+    "ginger": "Jengibre", "root": "Raíz", "gooseberry": "Grosella espinosa",
+    "granadilla": "Granadilla", "grape": "Uva", "grapefruit": "Pomelo",
+    "guava": "Guayaba", "hazelnut": "Avellana", "huckleberry": "Arándano silvestre",
+    "kaki": "Caqui", "kiwi": "Kiwi", "kohlrabi": "Colirrábano",
+    "kumquats": "Kumquat", "lemon": "Limón", "limes": "Lima", "lychee": "Lichi",
+    "mandarine": "Mandarina", "mango": "Mango", "mangostan": "Mangostán",
+    "maracuja": "Maracuyá", "melon": "Melón", "piel": "Piel", "de": "de",
+    "sapo": "Sapo", "mulberry": "Mora", "nectarine": "Nectarina",
+    "flat": "Plana", "nut": "Nuez", "forest": "Bosque", "pecan": "Pecana",
+    "onion": "Cebolla", "peeled": "Pelada", "orange": "Naranja",
+    "papaya": "Papaya", "passion": "Pasión", "peach": "Durazno",
+    "pear": "Pera", "pepino": "Pepino dulce", "pepper": "Pimiento",
+    "physalis": "Physalis", "with": "con", "pineapple": "Piña",
+    "mini": "Mini", "pitahaya": "Pitahaya", "plum": "Ciruela",
+    "pomegranate": "Granada", "pomelo": "Pomelo", "sweetie": "Dulce",
+    "potato": "Papa", "washed": "Lavada", "sweet": "Dulce", "quince": "Membrillo",
+    "rambutan": "Rambután", "raspberry": "Frambuesa", "redcurrant": "Grosella roja",
+    "salak": "Salak", "strawberry": "Fresa", "wedge": "Gajo",
+    "tamarillo": "Tamarillo", "tangelo": "Tangelo", "tomato": "Tomate",
+    "not": "no", "ripened": "madurado", "walnut": "Nuez de nogal",
+    "watermelon": "Sandía", "zucchini": "Calabacín", "dark": "Oscuro",
+    "almond": "Almendra", "red": "Roja", "yellow": "Amarilla", "green": "Verde",
+    "black": "Negra", "white": "Blanca", "pink": "Rosa", "blue": "Azul",
+    "wax": "Cera", "rainier": "Rainier", "lady": "Lady", "finger": "Finger",
+    "crimson": "Crimson", "snow": "Snow", "golden": "Golden",
+    "granny": "Granny", "smith": "Smith", "delicious": "Delicious",
+    "braeburn": "Braeburn", "meyer": "Meyer", "abate": "Abate",
+    "forelle": "Forelle", "kaiser": "Kaiser", "monster": "Monster",
+    "williams": "Williams", "stone": "Piedra", "heart": "Corazón",
+    "maroon": "Granate",
+}
+
+
+def traducir_nombre_clase(nombre_clase: str) -> str:
+    """Traduce dinámicamente cada palabra del nombre de la clase al español."""
+    palabras = nombre_clase.replace("_", " ").strip().split()
+    traducidas = []
+    for palabra in palabras:
+        clave = palabra.lower()
+        if clave.isdigit():
+            traducidas.append(palabra)
+        elif clave in PALABRAS_ES:
+            traducidas.append(PALABRAS_ES[clave])
+        else:
+            traducidas.append(palabra.capitalize())
+    return " ".join(traducidas)
+
+
+# Alias para no romper el resto del código
+formatear_nombre = traducir_nombre_clase
 
 
 def predecir(modelo, class_names, img: Image.Image):
