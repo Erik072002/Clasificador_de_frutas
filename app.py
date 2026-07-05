@@ -10,9 +10,8 @@ from PIL import Image
 # Configuración general
 # ---------------------------------------------------------------------------
 IMG_SIZE = (224, 224)
-MODEL_DIR = Path("modelo_frutas_mobilenet")
-MODEL_PATH = MODEL_DIR / "frutas_mobilenet.h5"
-CLASSES_PATH = MODEL_DIR / "class_names.json"
+MODEL_PATH = Path("frutas_mobilenet.h5")
+CLASSES_PATH = Path("class_names.json")
 TOP_K = 5
 
 st.set_page_config(
